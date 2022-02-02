@@ -311,7 +311,10 @@ public class ModLoader {
 			ThrowException(v2);
 		}
 	}
-	
+    public static int getUniqueSpriteIndex(String s)
+    {
+    	return BLTexturesManager.getBlockTexture(s);
+    }
 	/**
 	 * Use this to add custom images for your items and blocks.
 	 * @param fileToOverride
