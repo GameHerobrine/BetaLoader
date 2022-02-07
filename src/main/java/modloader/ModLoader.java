@@ -20,7 +20,6 @@ import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.Session;
 import net.minecraft.entity.EntityBase;
 import net.minecraft.entity.EntityEntry;
-import net.minecraft.entity.EntityRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Living;
 import net.minecraft.entity.player.PlayerBase;
@@ -86,7 +85,6 @@ public class ModLoader {
 	private static final File cfgdir = new File(Minecraft.getGameDirectory(), "/config/");
 	private static final File cfgfile = new File(cfgdir, "ModLoader.cfg");
 	public static java.util.logging.Level cfgLoggingLevel = java.util.logging.Level.FINER;
-	private static Map<String, Class<? extends EntityBase>> classMap = null;
 	private static long clock = 0L;
 	public static final boolean DEBUG = false;
 	private static Field field_animList = null;
@@ -249,7 +247,7 @@ public class ModLoader {
 	 */
 	private static void addMod(ClassLoader loader, ModEntry modEntry) {
 		ModsStorage.loadingMod = modEntry;
-		String modID = modEntry.getModID();
+		String modID = modEntry.getModID().toString();
 		File modFile = modEntry.getModConvertedFile();
 		String modClassName = modEntry.getClasspath() + "." + modEntry.getMainClass();
 		Class<? extends BaseMod> modClass = JavassistUtil.getModClass(loader, modFile, modClassName);
@@ -470,7 +468,7 @@ public class ModLoader {
 	 * @param biomes
 	 */
 	public static void AddSpawn(String entityName, int weightedProb, EntityType entityType, Biome... biomes) {
-		Class<? extends EntityBase> entityClass = classMap.get(entityName);
+		Class<? extends EntityBase> entityClass = (Class<? extends EntityBase>) EntityRegistryAccessor.getStringToClassMap().get(entityName);
 		if ((entityClass != null) && (Living.class.isAssignableFrom(entityClass))) {
 			AddSpawn((Class<? extends Living>) entityClass, weightedProb, entityType, biomes);
 		}
@@ -608,7 +606,6 @@ public class ModLoader {
 		
 		try {
 			instance = getMinecraftInstance();
-			classMap = getPrivateValue(EntityRegistry.class, null, 0);
 			field_modifiers = Field.class.getDeclaredField("modifiers");
 			field_modifiers.setAccessible(true);
 			field_blockList = Session.class.getDeclaredFields()[0];
@@ -1189,7 +1186,7 @@ public class ModLoader {
 	 * @param biomes
 	 */
 	public static void RemoveSpawn(String entityName, EntityType entityType, Biome... biomes) {
-		Class<? extends EntityBase> entityClass = classMap.get(entityName);
+		Class<? extends EntityBase> entityClass = (Class<? extends EntityBase>) EntityRegistryAccessor.getStringToClassMap().get(entityName);
 		if ((entityClass != null) && (Living.class.isAssignableFrom(entityClass))) {
 			RemoveSpawn((Class<? extends Living>) entityClass, entityType, biomes);
 		}
